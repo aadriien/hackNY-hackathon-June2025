@@ -19,3 +19,4 @@ function handleSubmission(event: CustomEvent<string>) {
 
 <Header mode={headerMode} />
 <Questionnaire on:submit={handleSubmission} on:typing={handleTyping} />
+
