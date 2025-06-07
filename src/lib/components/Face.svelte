@@ -73,6 +73,8 @@
 
       const cutoff = Date.now() - 5000;
       expressionHistory = expressionHistory.filter(e => e.timestamp >= cutoff);
+      console.log(detections);
+
     }
   }
 

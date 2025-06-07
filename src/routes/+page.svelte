@@ -34,20 +34,9 @@ let faceRef: InstanceType<typeof FaceComponent> | null = null;
     const finalResponse = event.detail;
     console.log("User answers:", finalResponse);
 
-    let expressionsPrompt = "No facial expressions captured.";
-    try {
-      const summary = await faceRef?.collectExpressions?.();
-      expressionsPrompt = faceRef?.formatExpressionsPrompt?.(summary) ?? expressionsPrompt;
-    } catch (err) {
-      console.warn("Facial data unavailable:", err);
-    }
-
     const mergedPrompt = `
     Questionnaire Responses:
     ${finalResponse}
-
-    Facial Expressions Summary:
-    ${expressionsPrompt}
     `;
 
     try {
