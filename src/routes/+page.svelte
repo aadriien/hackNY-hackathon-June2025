@@ -1,9 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
+
     import Header from '$lib/components/Header.svelte';
     import Face from '$lib/components/Face.svelte';
     import Questionnaire from '$lib/components/Questionnaires.svelte';
     
+    import callApi from '$lib/api.ts';
+    
+
     let headerMode: 'default' | 'typing' | 'submitted' = 'default';
     
     function handleTyping() {
@@ -27,13 +31,29 @@
             await new Promise(r => setTimeout(r, 50));
         }
     }
+
+    async function queryWithExpressions() {
+        await waitForExpressionHistory();
+        expressionHistory.startContinuousExpressionTracking();
+
+        const emotionSummary = await expressionHistory.collectExpressions(5000);
+        const formattedEmotions = expressionHistory.formatExpressionsPrompt(emotionSummary);
+
+        const userPrompt = `
+            Here are the expressions this person is making at you:
+            \n${formattedEmotions}\n
+        `;
+
+        const response = await callApi(userPrompt);
+        const resultText = response.choices?.[0]?.message?.content;
+        console.log(resultText);
+
+    }
     
     onMount(async () => {
-        await waitForExpressionHistory();
-        
-        expressionHistory.startContinuousExpressionTracking();
-        const emotionSummary = await expressionHistory.collectExpressions(5000);
-        console.log(emotionSummary);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        await queryWithExpressions();
     });
     
     

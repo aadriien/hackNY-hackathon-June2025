@@ -119,6 +119,15 @@
             .slice(0, 6);
     }
 
+    function formatExpressionsPrompt(averages) {
+        const sorted = Object.entries(averages || {}).sort((a, b) => b[1] - a[1]);
+        const top = sorted.slice(0, 5);
+
+        return top.map(([emotion, value]) =>
+            `- ${emotion}: ${(value * 100).toFixed(1)}%`
+        ).join('\n');
+    }
+
     async function collectExpressions(duration = 5000) {
         // Reset expressions to start fresh
         expressionHistory = [];  
@@ -160,7 +169,7 @@
         startContinuousExpressionTracking();
     });
 
-    export { collectExpressions, startContinuousExpressionTracking };
+    export { collectExpressions, startContinuousExpressionTracking, formatExpressionsPrompt };
 </script>
 
 
