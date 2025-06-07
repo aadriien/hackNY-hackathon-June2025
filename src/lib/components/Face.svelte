@@ -11,7 +11,7 @@
     let overlayCanvas;
 
     async function loadModels() {
-        const MODEL_URL = location.origin + "/models";
+        const MODEL_URL = "/models";
 
         console.log("Loading models from:", MODEL_URL);
 
