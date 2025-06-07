@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import Header from '$lib/components/Header.svelte';
-  import Face from '$lib/components/Face.svelte';
   import Questionnaire from '$lib/components/Questionnaires.svelte';
+  import Face from '$lib/components/Face.svelte';
   import callApi from "$lib/api";
+import type FaceComponent from '$lib/components/Face.svelte';
+
+let faceRef: InstanceType<typeof FaceComponent> | null = null;
 
   let headerMode: 'default' | 'typing' | 'submitted' = 'default';
   let hasInteracted = false;
-  let detections = {};
-  let expressionHistory = [];
+
 
   function handleTyping() {
     if (headerMode !== 'typing') {
@@ -28,51 +29,37 @@
 
   async function handleSubmission(event: CustomEvent<string>) {
     const finalResponse = event.detail;
-    console.log("User responses:", finalResponse);
+    console.log("User answers:", finalResponse);
 
-    // Combine with expression data if needed
-    const response = await callApi(finalResponse);
-    const result = response.choices?.[0]?.message?.content ?? "No result received.";
-
-    console.log("API result:", result);
-
-    headerMode = 'submitted';
-  }
-
-  async function waitForExpressionHistory() {
-    while (!expressionHistory) {
-      await new Promise(r => setTimeout(r, 50));
+    let expressionsPrompt = "No facial expressions captured.";
+    try {
+      const summary = await faceRef?.collectExpressions?.();
+      expressionsPrompt = faceRef?.formatExpressionsPrompt?.(summary) ?? expressionsPrompt;
+    } catch (err) {
+      console.warn("Facial data unavailable:", err);
     }
-  }
 
-  async function queryWithExpressions() {
-    await waitForExpressionHistory();
-    expressionHistory.startContinuousExpressionTracking();
+    const mergedPrompt = `
+    Questionnaire Responses:
+    ${finalResponse}
 
-    const emotionSummary = await expressionHistory.collectExpressions(5000);
-    const formattedEmotions = expressionHistory.formatExpressionsPrompt(emotionSummary);
-
-    const userPrompt = `
-      Here are the expressions this person is making at you:
-      \n${formattedEmotions}\n
+    Facial Expressions Summary:
+    ${expressionsPrompt}
     `;
 
-    const response = await callApi(userPrompt);
-    const resultText = response.choices?.[0]?.message?.content;
-    console.log("Facial expression result:", resultText);
+    try {
+      const response = await callApi(mergedPrompt);
+      const result = response.choices?.[0]?.message?.content ?? "No result received.";
+      console.log("Final result:", result);
+      headerMode = 'submitted';
+    } catch (e) {
+      console.error("API failed:", e);
+      headerMode = 'submitted';
+    }
   }
-
-  onMount(async () => {
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    await queryWithExpressions();
-  });
 </script>
 
 <main>
-  <div class="face-row">
-    <Face bind:detections bind:this={expressionHistory} />
-  </div>
-
   {#if !hasInteracted}
     <div class="start-screen">
       <button class="start-button" on:click={startExperience}>
@@ -90,7 +77,12 @@
         {/if}
       </div>
       <div class="form-side">
-        <Questionnaire on:submit={handleSubmission} on:typing={handleTyping} />
+        <Questionnaire
+          on:submit={handleSubmission}
+          on:typing={handleTyping}
+          {Face}
+          bind:faceRef
+        />
       </div>
     </div>
   {/if}
