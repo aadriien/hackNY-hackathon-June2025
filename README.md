@@ -1,8 +1,8 @@
 # ✨💅 Vibe Check
 
-Toy project made during [hackNY](https://hackny.org)'s "Stupid Shit No One Needs & Terrible Ideas" Hackathon (June 2025), sponsored by Major League Hacking!
+Toy project made during [hackNY](https://hackny.org)'s _"Stupid Shit No One Needs & Terrible Ideas"_ Hackathon (June 2025), sponsored by Major League Hacking!
 
-hacknY hackathon team: [Adisa Malik](https://github.com/amalik12), [Adrien Lynch](https://github.com/aadriien), [Dustin Tran](https://github.com/dustintran1324)
+**hackNY hackathon team:** [Adisa Malik](https://github.com/amalik12), [Adrien Lynch](https://github.com/aadriien), [Dustin Tran](https://github.com/dustintran1324)
 
 ## Tech Stack
 
