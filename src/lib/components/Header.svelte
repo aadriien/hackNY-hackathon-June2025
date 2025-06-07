@@ -1,8 +1,18 @@
-<!-- src/lib/components/Header.svelte -->
+<script lang="ts">
+  export let mode: 'default' | 'typing' | 'submitted' = 'default';
+</script>
+
 <div class="header">
-  <img src="src/assets/VibeCheckerLogo.svg" alt="Logo" class="logo" />
-  <h1 class="title">I'm Vibe Reader --- Read that carefully now</h1>
-  <p>We're gonna check if you pass the vibe for nyc's restaurants and bars. You probably won't anyways, but it doesn't hurt to try </p>
+  {#if mode === 'default'}
+    <img src="src/assets/Default.svg" alt="Logo" class="logo" />
+    <h1 class="title">We are Vibe Reader --- now read that again out loud, but quickly</h1>
+  {:else if mode === 'typing'}
+    <img src="src/assets/Typing.svg" alt="Typing Logo" class="logo" />
+    <h1 class="title">I know what you are.... I see what you do</h1>
+  {:else if mode === 'submitted'}
+    <img src="src/assets/Result.svg" alt="Submitted Logo" class="logo" />
+    <h1 class="title">okay</h1>
+  {/if}
 </div>
 
 <style>
@@ -10,19 +20,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 3rem;
     text-align: center;
+    margin-top: 2rem;
   }
 
   .logo {
-    width: 250px;
+    width: 400px;
     height: auto;
     margin-bottom: 1rem;
   }
 
   .title {
-    font-size: 2.5rem;
-    font-weight: 600;
+    font-size: 2rem;
     font-family: 'Playfair Display', serif;
+    font-weight: 600;
   }
 </style>
