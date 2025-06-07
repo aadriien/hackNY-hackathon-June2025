@@ -20,36 +20,23 @@
   let currentQuestion = 0;
   let loading = false;
 
-  let clickSound: HTMLAudioElement;
-  let backSound: HTMLAudioElement;
-  let submitSound: HTMLAudioElement;
-
-  function playSound(audio: HTMLAudioElement) {
-    if (!audio) return;
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
-  }
-
   function handleTypingInput() {
     dispatch('typing');
   }
 
   function handleNext() {
-    playSound(clickSound);
     if (currentQuestion < questions.length - 1) {
       currentQuestion += 1;
     }
   }
 
   function handleBack() {
-    playSound(backSound);
     if (currentQuestion > 0) {
       currentQuestion -= 1;
     }
   }
 
 async function handleSubmit() {
-  playSound(submitSound);
   loading = true;
 
   try {
@@ -79,10 +66,6 @@ async function handleSubmit() {
 }
 
 </script>
-
-<audio bind:this={clickSound} src="assets/audio/clickbutton.mp3" preload="auto" />
-<audio bind:this={backSound} src="assets/audio/backbutton.mp3" preload="auto" />
-<audio bind:this={submitSound} src="assets/audio/submit.mp3" preload="auto" />
 
 <div class="questionnaire-container">
   <h3 class="question-title">

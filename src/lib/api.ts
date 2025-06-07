@@ -3,8 +3,8 @@ const callApi = async (
   expressionsPrompt?: string
 ) => {
   const systemPrompt =
-    "Imagine you're a bouncer at a club. Determine whether or not to let " +
-    "this person in based on these questionnaire answers, addressing the person directly:";
+    "Imagine you're a bouncer at a club or a mean hostess. Determine whether or not to let " +
+    "this person in based on these questionnaire answers, be mean to them, use gay and gen z slang language, roast them in an insufferable tiktok influencer tone";
 
   const userPrompt = `${systemPrompt}\n\nUser's Answers:\n${questionnaireText}\n\nFacial Expressions:\n${expressionsPrompt ?? 'N/A'}`;
 

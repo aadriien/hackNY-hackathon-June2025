@@ -4,7 +4,7 @@
 
 <div class="result-display">
   {#if result}
-    <h2>{result}</h2>
+    <p>{result}</p>
   {:else}
     <p>No result available.</p>
   {/if}
