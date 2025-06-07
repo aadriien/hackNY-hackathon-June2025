@@ -7,7 +7,7 @@ Toy project made during [hackNY](https://hackny.org)'s _"Stupid Shit No One Need
 
 ## Live Link
 
-This site is LIVE at [https://vibe-checker-98nz.onrender.com](https://vibe-checker-98nz.onrender.com).. go check your vibe!
+This site is **LIVE** at **[https://vibe-checker-98nz.onrender.com](https://vibe-checker-98nz.onrender.com)**... go check your _vibe_!!
 
 
 ## Tech Stack
