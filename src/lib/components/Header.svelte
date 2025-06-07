@@ -7,10 +7,10 @@
   function updateAudioSource(mode: typeof mode) {
     const src =
       mode === 'typing'
-        ? '/src/assets/audio/typing.mp3'
+        ? '/assets/audio/typing.mp3'
         : mode === 'submitted'
-        ? '/src/assets/audio/result.mp3'
-        : '/src/assets/audio/default.mp3';
+        ? '/assets/audio/result.mp3'
+        : '/assets/audio/default.mp3';
 
     if (audio) {
       audio.pause();
@@ -34,13 +34,13 @@
 
 <div class="header">
   {#if mode === 'default'}
-    <img src="/src/assets/Default.svg" alt="Logo" class="logo" />
+    <img src="/assets/Default.svg" alt="Logo" class="logo" />
     <h1 class="title">We are Vibe Reader --- now read that again out loud, but quickly</h1>
   {:else if mode === 'typing'}
-    <img src="/src/assets/Typing.svg" alt="Typing Logo" class="logo" />
+    <img src="/assets/Typing.svg" alt="Typing Logo" class="logo" />
     <h1 class="title">I know what you are.... I see what you do</h1>
   {:else if mode === 'submitted'}
-    <img src="/src/assets/Result.svg" alt="Submitted Logo" class="logo" />
+    <img src="/assets/Result.svg" alt="Submitted Logo" class="logo" />
     <h1 class="title">okay</h1>
   {/if}
 </div>

@@ -68,9 +68,9 @@ async function handleSubmit() {
 
 </script>
 
-<audio bind:this={clickSound} src="src/assets/audio/clickbutton.mp3" preload="auto" />
-<audio bind:this={backSound} src="src/assets/audio/backbutton.mp3" preload="auto" />
-<audio bind:this={submitSound} src="src/assets/audio/submit.mp3" preload="auto" />
+<audio bind:this={clickSound} src="assets/audio/clickbutton.mp3" preload="auto" />
+<audio bind:this={backSound} src="assets/audio/backbutton.mp3" preload="auto" />
+<audio bind:this={submitSound} src="assets/audio/submit.mp3" preload="auto" />
 
 <div class="questionnaire-container">
   <h3 class="question-title">
@@ -126,7 +126,7 @@ async function handleSubmit() {
 
   {#if loading}
     <div class="loader-container">
-      <img src="src/assets/cd_loader.png" alt="Loading..." class="png-loader" />
+      <img src="assets/cd_loader.png" alt="Loading..." class="png-loader" />
       <p>Reading your vibe...</p>
     </div>
   {/if}
