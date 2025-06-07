@@ -1,6 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import callApi from '$lib/api';
+  import Face from '$lib/components/Face.svelte';
+  
+  let faceComponent: any;
 
   const dispatch = createEventDispatcher();
 
@@ -8,7 +11,9 @@
     "Congrats, you just turned 21. Now, what would you tell the bartender when you order a drink? And what drink would that be?",
     "If you have a free afternoon, and you decide to not bedrot for the first time, what would you do?",
     "Where do you shop?",
-    "Tell me your Spotify Wrapped top genres. Don't fake it, we know you're basic"
+    "Tell me your Spotify Wrapped top genres. Don't fake it, we know you're basic",
+    "Look into the camera for 5 seconds so we can analyze your expression"
+
   ];
 
   let answers: string[] = Array(questions.length).fill('');
@@ -43,25 +48,30 @@
     }
   }
 
-  async function handleSubmit() {
-    playSound(submitSound);
+async function handleSubmit() {
+  playSound(submitSound);
+  loading = true;
+
+  try {
     const resultText = questions
       .map((q, i) => `${q} ${answers[i]}`)
       .join(' | ');
 
-    loading = true;
+    const expressionSummary = await faceComponent?.collectExpressions?.();
+    const expressionPrompt = faceComponent?.formatExpressionsPrompt?.(expressionSummary);
 
-    try {
-      const response = await callApi(resultText);
-      const result = response.choices?.[0]?.message?.content ?? "No result received.";
-      dispatch('submit', result);
-    } catch (error) {
-      console.error("API Error:", error);
-      dispatch('submit', "Something went wrong while processing your vibe.");
-    } finally {
-      loading = false;
-    }
+    const response = await callApi(resultText, expressionPrompt);
+    const result = response.choices?.[0]?.message?.content ?? "No result received.";
+
+    dispatch('submit', result);
+  } catch (error) {
+    console.error("API Error:", error);
+    dispatch('submit', "Something went wrong while processing your vibe.");
+  } finally {
+    loading = false;
   }
+}
+
 </script>
 
 <audio bind:this={clickSound} src="src/assets/audio/clickbutton.mp3" preload="auto" />
@@ -73,9 +83,10 @@
     Question {currentQuestion + 1}/{questions.length}
   </h3>
 
-  <div class="question-block">
-    <p class="question-text">{questions[currentQuestion]}</p>
+<div class="question-block">
+  <p class="question-text">{questions[currentQuestion]}</p>
 
+  {#if currentQuestion < 4}
     <input
       type="text"
       class="question-input"
@@ -83,46 +94,49 @@
       bind:value={answers[currentQuestion]}
       on:input={handleTypingInput}
     />
+  {:else if currentQuestion === 4}
+    <div class="face-capture">
+    <Face bind:this={faceComponent} />
+  </div>
+  {/if}
 
-    <div class="button-row">
-      {#if currentQuestion > 0}
-        <button
-          type="button"
-          on:click={handleBack}
-          class="action-button"
-        >
-          Back
-        </button>
-      {/if}
+  <div class="button-row">
+    {#if currentQuestion > 0}
+      <button type="button" on:click={handleBack} class="action-button">Back</button>
+    {/if}
 
-      {#if currentQuestion < questions.length - 1}
-        <button
-          type="button"
-          on:click={handleNext}
-          disabled={!answers[currentQuestion]}
-          class="action-button {answers[currentQuestion].trim() ? 'ready' : 'disabled'}"
-        >
-          Next
-        </button>
-      {:else}
-        <button
-          type="button"
-          on:click={handleSubmit}
-          disabled={answers.some(ans => ans.trim() === "")}
-          class="action-button {answers.some(ans => ans.trim() === '') ? 'disabled' : 'ready'} submit-button"
-        >
+    {#if currentQuestion < questions.length - 1}
+      <button
+        type="button"
+        on:click={handleNext}
+        disabled={!answers[currentQuestion]?.trim()}
+        class="action-button {answers[currentQuestion]?.trim() ? 'ready' : 'disabled'}"
+      >
+        Next
+      </button>
+    {:else}
+      <button
+        type="button"
+        on:click={handleSubmit}
+        disabled={answers.slice(0, 4).some(ans => ans.trim() === "") || loading}
+        class="action-button {answers.slice(0, 4).some(ans => ans.trim() === '') || loading ? 'disabled' : 'ready'} submit-button"
+      >
+        {#if loading}
+          Submitting...
+        {:else}
           Submit
-        </button>
-      {/if}
-    </div>
-
-    {#if loading}
-      <div class="loader-container">
-        <img src="src/assets/cd_loader.png" alt="Loading..." class="png-loader" />
-        <p>Reading your vibe...</p>
-      </div>
+        {/if}
+      </button>
     {/if}
   </div>
+
+  {#if loading}
+    <div class="loader-container">
+      <img src="src/assets/cd_loader.png" alt="Loading..." class="png-loader" />
+      <p>Reading your vibe...</p>
+    </div>
+  {/if}
+</div>
 </div>
 
 
@@ -224,6 +238,11 @@
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
   }
+.face-capture {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
 
   @keyframes spin {
     100% {
