@@ -8,30 +8,43 @@
     "Congrats, you just turned 21. Now, what would you tell the bartender when you order a drink? And what drink would that be?",
     "If you have a free afternoon, and you decide to not bedrot for the first time, what would you do?",
     "Where do you shop?",
-    "Tell me your Spotify Wrapped top genres. Don't fake it, we know you're basic."
+    "Tell me your Spotify Wrapped top genres. Don't fake it, we know you're basic"
   ];
 
   let answers: string[] = Array(questions.length).fill('');
   let currentQuestion = 0;
   let loading = false;
 
-  function handleNext() {
-    if (currentQuestion < questions.length - 1) {
-      currentQuestion += 1;
-    }
-  }
+  let clickSound: HTMLAudioElement;
+  let backSound: HTMLAudioElement;
+  let submitSound: HTMLAudioElement;
 
-  function handleBack() {
-    if (currentQuestion > 0) {
-      currentQuestion -= 1;
-    }
+  function playSound(audio: HTMLAudioElement) {
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
   }
 
   function handleTypingInput() {
     dispatch('typing');
   }
 
+  function handleNext() {
+    playSound(clickSound);
+    if (currentQuestion < questions.length - 1) {
+      currentQuestion += 1;
+    }
+  }
+
+  function handleBack() {
+    playSound(backSound);
+    if (currentQuestion > 0) {
+      currentQuestion -= 1;
+    }
+  }
+
   async function handleSubmit() {
+    playSound(submitSound);
     const resultText = questions
       .map((q, i) => `${q} ${answers[i]}`)
       .join(' | ');
@@ -51,62 +64,67 @@
   }
 </script>
 
+<audio bind:this={clickSound} src="src/assets/audio/clickbutton.mp3" preload="auto" />
+<audio bind:this={backSound} src="src/assets/audio/backbutton.mp3" preload="auto" />
+<audio bind:this={submitSound} src="src/assets/audio/submit.mp3" preload="auto" />
+
 <div class="questionnaire-container">
   <h3 class="question-title">
     Question {currentQuestion + 1}/{questions.length}
   </h3>
 
-  {#if loading}
-    <div class="loader-container">
-      <img src="src/assets/cd_loader.png" alt="Loading..." class="png-loader" />
-      <p>Reading your vibe...</p>
+  <div class="question-block">
+    <p class="question-text">{questions[currentQuestion]}</p>
+
+    <input
+      type="text"
+      class="question-input"
+      placeholder="Say what's on your mind"
+      bind:value={answers[currentQuestion]}
+      on:input={handleTypingInput}
+    />
+
+    <div class="button-row">
+      {#if currentQuestion > 0}
+        <button
+          type="button"
+          on:click={handleBack}
+          class="action-button"
+        >
+          Back
+        </button>
+      {/if}
+
+      {#if currentQuestion < questions.length - 1}
+        <button
+          type="button"
+          on:click={handleNext}
+          disabled={!answers[currentQuestion]}
+          class="action-button {answers[currentQuestion].trim() ? 'ready' : 'disabled'}"
+        >
+          Next
+        </button>
+      {:else}
+        <button
+          type="button"
+          on:click={handleSubmit}
+          disabled={answers.some(ans => ans.trim() === "")}
+          class="action-button {answers.some(ans => ans.trim() === '') ? 'disabled' : 'ready'} submit-button"
+        >
+          Submit
+        </button>
+      {/if}
     </div>
-  {:else}
-    <div class="question-block">
-      <p class="question-text">{questions[currentQuestion]}</p>
 
-      <input
-        type="text"
-        class="question-input"
-        placeholder="Say what's on your mind"
-        bind:value={answers[currentQuestion]}
-        on:input={handleTypingInput}
-      />
-
-      <div class="button-row">
-        {#if currentQuestion > 0}
-          <button
-            type="button"
-            on:click={handleBack}
-            class="action-button"
-          >
-            Back
-          </button>
-        {/if}
-
-        {#if currentQuestion < questions.length - 1}
-          <button
-            type="button"
-            on:click={handleNext}
-            disabled={!answers[currentQuestion].trim()}
-            class="action-button {answers[currentQuestion].trim() ? 'ready' : 'disabled'}"
-          >
-            Next
-          </button>
-        {:else}
-          <button
-            type="button"
-            on:click={handleSubmit}
-            disabled={answers.some(ans => ans.trim() === "")}
-            class="action-button {answers.some(ans => ans.trim() === '') ? 'disabled' : 'ready'} submit-button"
-          >
-            Submit
-          </button>
-        {/if}
+    {#if loading}
+      <div class="loader-container">
+        <img src="src/assets/cd_loader.png" alt="Loading..." class="png-loader" />
+        <p>Reading your vibe...</p>
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
+
 
 <style>
   .questionnaire-container {
