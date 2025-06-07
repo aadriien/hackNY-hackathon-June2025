@@ -17,12 +17,6 @@
     }
   }
 
-  function handleSubmission(event: CustomEvent<string>) {
-    const finalResponse = event.detail;
-    console.log("User responses:", finalResponse);
-    headerMode = 'submitted';
-  }
-
   function startExperience() {
     hasInteracted = true;
     headerMode = 'default';
