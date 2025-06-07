@@ -4,8 +4,7 @@
 
 <div class="result-display">
   {#if result}
-    <h2>Result:</h2>
-    <pre>{JSON.stringify(result, null, 2)}</pre>
+    <h2>{result}</h2>
   {:else}
     <p>No result available.</p>
   {/if}

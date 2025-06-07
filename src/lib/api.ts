@@ -4,7 +4,7 @@ const callApi = async (
 ) => {
   const systemPrompt =
     "Imagine you're a bouncer at a club. Determine whether or not to let " +
-    "this person in based on this description: Likes drinking decaf coffee.";
+    "this person in based on these questionnaire answers, addressing the person directly:";
 
   const userPrompt = `${systemPrompt}\n\nUser's Answers:\n${questionnaireText}\n\nFacial Expressions:\n${expressionsPrompt ?? 'N/A'}`;
 
