@@ -30,7 +30,7 @@
 </script>
 
 
-<audio bind:this={audio} loop />
+<audio bind:this={audio} loop></audio>
 
 <div class="header">
   {#if mode === 'default'}
