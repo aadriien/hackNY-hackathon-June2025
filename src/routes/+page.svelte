@@ -4,11 +4,14 @@
   import Face from '$lib/components/Face.svelte';
   import callApi from "$lib/api";
 import type FaceComponent from '$lib/components/Face.svelte';
+  import ResultDisplay from '$lib/components/ResultDisplay.svelte';
+
 
 let faceRef: InstanceType<typeof FaceComponent> | null = null;
 
   let headerMode: 'default' | 'typing' | 'submitted' = 'default';
   let hasInteracted = false;
+  let output: string | null = null;
 
 
   function handleTyping() {
@@ -51,6 +54,7 @@ let faceRef: InstanceType<typeof FaceComponent> | null = null;
       const response = await callApi(mergedPrompt);
       const result = response.choices?.[0]?.message?.content ?? "No result received.";
       console.log("Final result:", result);
+      output = result;
       headerMode = 'submitted';
     } catch (e) {
       console.error("API failed:", e);
@@ -77,12 +81,16 @@ let faceRef: InstanceType<typeof FaceComponent> | null = null;
         {/if}
       </div>
       <div class="form-side">
+        {#if headerMode === 'submitted'}
+          <ResultDisplay result={output} />
+        {:else}
         <Questionnaire
-          on:submit={handleSubmission}
-          on:typing={handleTyping}
-          {Face}
-          bind:faceRef
-        />
+        on:submit={handleSubmission}
+        on:typing={handleTyping}
+        {Face}
+        bind:faceRef
+      />
+        {/if}
       </div>
     </div>
   {/if}

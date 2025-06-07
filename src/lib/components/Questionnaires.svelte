@@ -56,14 +56,8 @@ async function handleSubmit() {
     const resultText = questions
       .map((q, i) => `${q} ${answers[i]}`)
       .join(' | ');
-
-    const expressionSummary = await faceComponent?.collectExpressions?.();
-    const expressionPrompt = faceComponent?.formatExpressionsPrompt?.(expressionSummary);
-
-    const response = await callApi(resultText, expressionPrompt);
-    const result = response.choices?.[0]?.message?.content ?? "No result received.";
-
-    dispatch('submit', result);
+      
+    dispatch('submit', resultText);
   } catch (error) {
     console.error("API Error:", error);
     dispatch('submit', "Something went wrong while processing your vibe.");
