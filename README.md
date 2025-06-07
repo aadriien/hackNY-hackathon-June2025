@@ -4,6 +4,12 @@ Toy project made during [hackNY](https://hackny.org)'s _"Stupid Shit No One Need
 
 **hackNY hackathon team:** [Adisa Malik](https://github.com/amalik12), [Adrien Lynch](https://github.com/aadriien), [Dustin Tran](https://github.com/dustintran1324)
 
+
+## Live Link
+
+This site is LIVE at [https://vibe-checker-98nz.onrender.com](https://vibe-checker-98nz.onrender.com).. go check your vibe!
+
+
 ## Tech Stack
 
 ### Web
