@@ -1,14 +1,22 @@
-<script>
-    import Face from '$lib/components/face.svelte';
-    import Questionnaires from '$lib/components/Questionnaires.svelte';
-    import ResultDisplay from '$lib/components/ResultDisplay.svelte';
+<script lang="ts">
+  import Header from '$lib/components/Header.svelte';
+  import Questionnaire from '$lib/components/Questionnaires.svelte';
+
+  let headerMode: 'default' | 'typing' | 'submitted' = 'default';
+
+  function handleTyping() {
+    if (headerMode !== 'typing') {
+      headerMode = 'typing';
+    }
+  }
+
+function handleSubmission(event: CustomEvent<string>) {
+  const finalResponse = event.detail;
+  console.log("User responses:", finalResponse);
+  headerMode = 'submitted';
+}
 </script>
 
+<Header mode={headerMode} />
+<Questionnaire on:submit={handleSubmission} on:typing={handleTyping} />
 
-<main></main>
-    <h1>Welcome to SvelteKit</h1>
-    <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-
-    
-
-<main></main>
