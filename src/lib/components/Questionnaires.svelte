@@ -53,10 +53,22 @@ async function handleSubmit() {
   loading = true;
 
   try {
-    const resultText = questions
+
+
+  let expressionsPrompt = "No facial expressions captured.";
+    try {
+      const summary = await faceComponent?.collectExpressions();
+      
+      expressionsPrompt = faceComponent?.formatExpressionsPrompt(summary) ?? expressionsPrompt;
+    } catch (err) {
+      console.warn("Facial data unavailable:", err);
+    }
+
+  answers[4] = expressionsPrompt;
+
+  const resultText = questions
       .map((q, i) => `${q} ${answers[i]}`)
       .join(' | ');
-      
     dispatch('submit', resultText);
   } catch (error) {
     console.error("API Error:", error);
