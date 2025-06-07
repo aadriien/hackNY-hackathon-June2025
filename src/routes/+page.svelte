@@ -3,13 +3,12 @@
   import Header from '$lib/components/Header.svelte';
   import Face from '$lib/components/Face.svelte';
   import Questionnaire from '$lib/components/Questionnaires.svelte';
-  import callApi from '$lib/api.ts';
+  import callApi from "$lib/api";
 
   let headerMode: 'default' | 'typing' | 'submitted' = 'default';
   let hasInteracted = false;
-
   let detections = {};
-  let expressionHistory;
+  let expressionHistory = [];
 
   function handleTyping() {
     if (headerMode !== 'typing') {
@@ -25,6 +24,19 @@
   function restartExperience() {
     hasInteracted = false;
     headerMode = 'default';
+  }
+
+  async function handleSubmission(event: CustomEvent<string>) {
+    const finalResponse = event.detail;
+    console.log("User responses:", finalResponse);
+
+    // Combine with expression data if needed
+    const response = await callApi(finalResponse);
+    const result = response.choices?.[0]?.message?.content ?? "No result received.";
+
+    console.log("API result:", result);
+
+    headerMode = 'submitted';
   }
 
   async function waitForExpressionHistory() {
@@ -47,7 +59,7 @@
 
     const response = await callApi(userPrompt);
     const resultText = response.choices?.[0]?.message?.content;
-    console.log(resultText);
+    console.log("Facial expression result:", resultText);
   }
 
   onMount(async () => {
