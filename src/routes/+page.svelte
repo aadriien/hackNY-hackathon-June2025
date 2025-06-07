@@ -1,20 +1,37 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import Header from '$lib/components/Header.svelte';
-  import Face from '$lib/components/Face.svelte';
-  import Questionnaire from '$lib/components/Questionnaires.svelte';
-  import callApi from "$lib/api";
+    import { onMount } from "svelte";
 
-  let headerMode: 'default' | 'typing' | 'submitted' = 'default';
+    import Header from '$lib/components/Header.svelte';
+    import Face from '$lib/components/Face.svelte';
+    import Questionnaire from '$lib/components/Questionnaires.svelte';
+    
+    import callApi from '$lib/api.ts';
+    
+
+    let headerMode: 'default' | 'typing' | 'submitted' = 'default';
   let hasInteracted = false;
-  let detections = {};
-  let expressionHistory = [];
-
-  function handleTyping() {
-    if (headerMode !== 'typing') {
-      headerMode = 'typing';
+    
+    function handleTyping() {
+        if (headerMode !== 'typing') {
+            headerMode = 'typing';
+        }
     }
-  }
+    
+    function handleSubmission(event: CustomEvent<string>) {
+        const finalResponse = event.detail;
+        console.log("User responses:", finalResponse);
+        headerMode = 'submitted';
+    }
+    
+    
+    let detections = {};
+    let expressionHistory;
+    
+    async function waitForExpressionHistory() {
+        while (!expressionHistory) {
+            await new Promise(r => setTimeout(r, 50));
+        }
+    }
 
   function startExperience() {
     hasInteracted = true;
@@ -25,75 +42,64 @@
     hasInteracted = false;
     headerMode = 'default';
   }
+    async function queryWithExpressions() {
+        await waitForExpressionHistory();
+        expressionHistory.startContinuousExpressionTracking();
 
-  async function handleSubmission(event: CustomEvent<string>) {
-    const finalResponse = event.detail;
-    console.log("User responses:", finalResponse);
+        const emotionSummary = await expressionHistory.collectExpressions(5000);
+        const formattedEmotions = expressionHistory.formatExpressionsPrompt(emotionSummary);
 
-    // Combine with expression data if needed
-    const response = await callApi(finalResponse);
-    const result = response.choices?.[0]?.message?.content ?? "No result received.";
+        const userPrompt = `
+            Here are the expressions this person is making at you:
+            \n${formattedEmotions}\n
+        `;
 
-    console.log("API result:", result);
+        const response = await callApi(userPrompt);
+        const resultText = response.choices?.[0]?.message?.content;
+        console.log(resultText);
 
-    headerMode = 'submitted';
-  }
-
-  async function waitForExpressionHistory() {
-    while (!expressionHistory) {
-      await new Promise(r => setTimeout(r, 50));
     }
-  }
+    
+    onMount(async () => {
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
-  async function queryWithExpressions() {
-    await waitForExpressionHistory();
-    expressionHistory.startContinuousExpressionTracking();
-
-    const emotionSummary = await expressionHistory.collectExpressions(5000);
-    const formattedEmotions = expressionHistory.formatExpressionsPrompt(emotionSummary);
-
-    const userPrompt = `
-      Here are the expressions this person is making at you:
-      \n${formattedEmotions}\n
-    `;
-
-    const response = await callApi(userPrompt);
-    const resultText = response.choices?.[0]?.message?.content;
-    console.log("Facial expression result:", resultText);
-  }
-
-  onMount(async () => {
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    await queryWithExpressions();
-  });
+        await queryWithExpressions();
+    });
+    
+    
+    
+    
 </script>
 
 <main>
-  <div class="face-row">
-    <Face bind:detections bind:this={expressionHistory} />
+    <!-- <h1>Welcome to SvelteKit</h1>
+    <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+     -->
+    <div class="face-row">
+        <Face bind:detections bind:this={expressionHistory} />
+    </div>
+    
+    {#if !hasInteracted}
+  <div class="start-screen">
+    <button class="start-button" on:click={startExperience}>
+      Click this button if you like reading
+    </button>
   </div>
-
-  {#if !hasInteracted}
-    <div class="start-screen">
-      <button class="start-button" on:click={startExperience}>
-        Click this button if you like reading
-      </button>
+{:else}
+  <div class="layout">
+    <div class="header-side">
+      <Header mode={headerMode} />
+      {#if headerMode === 'submitted'}
+        <button class="restart-button" on:click={restartExperience}>
+          Restart
+        </button>
+      {/if}
     </div>
-  {:else}
-    <div class="layout">
-      <div class="header-side">
-        <Header mode={headerMode} />
-        {#if headerMode === 'submitted'}
-          <button class="restart-button" on:click={restartExperience}>
-            Restart
-          </button>
-        {/if}
-      </div>
-      <div class="form-side">
-        <Questionnaire on:submit={handleSubmission} on:typing={handleTyping} />
-      </div>
+    <div class="form-side">
+      <Questionnaire on:submit={handleSubmission} on:typing={handleTyping} />
     </div>
-  {/if}
+  </div>
+{/if}
 </main>
 
 <style>
